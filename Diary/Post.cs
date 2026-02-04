@@ -1,9 +1,14 @@
-﻿namespace Diary
+﻿using System.Text.Json.Serialization;
+
+namespace Diary
 {
     public class Post
     {
-        int IdPost { get; set; }
-        string? PostText { get; set; }
-        int EmojiId { get; set; }
+        public int IdPost { get; set; }
+        public string? PostText { get; set; }
+        public int EmojiId { get; set; }
+
+        [JsonIgnore] 
+        public Emoji? Emoji { get; set; }
     }
 }
