@@ -1,6 +1,6 @@
 ﻿namespace Diary
 {
-    public class MoodDiaryDBContext : 
+    public class MoodDiaryDBContext
     {
     }
 }
