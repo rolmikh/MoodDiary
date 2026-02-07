@@ -23,6 +23,8 @@ namespace Diary.Models
                 entity.Property(e => e.EmojiId)
                 .IsRequired(true);
 
+                entity.Property(e => e.PostDate);
+
                 entity.HasOne(e => e.Emoji)
                 .WithMany(t => t.Posts)
                 .HasForeignKey(e => e.EmojiId)

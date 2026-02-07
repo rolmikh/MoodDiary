@@ -1,16 +1,18 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Diary.Models
+namespace Diary.DTO
 {
-    public class Post
+    public class CreatePostDTO
     {
-        
+        [JsonIgnore]
         public int IdPost { get; set; }
+
         public string? PostText { get; set; }
+
         public int EmojiId { get; set; }
-        public DateTime PostDate { get; set; }
 
         [JsonIgnore]
-        public Emoji? Emoji { get; set; }
+        public DateTime PostDate { get; set; }
+
     }
 }

@@ -38,6 +38,7 @@ namespace Diary.Controllers
                          {
                            PostText = post.PostText,
                            NameEmoji = emoji.NameEmoji,
+                           PostDate = post.PostDate,
                          };
 
             var result = await query.ToListAsync();
@@ -94,9 +95,17 @@ namespace Diary.Controllers
         // POST: api/Posts
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Post>> PostPost(Post post)
+        public async Task<ActionResult<Post>> PostPost(CreatePostDTO post)
         {
-            _context.Post.Add(post);
+            post.PostDate = DateTime.Now;
+
+            Post NewPost = new Post {
+                IdPost = post.IdPost,
+                PostText = post.PostText,
+                PostDate = post.PostDate,
+                EmojiId = post.EmojiId,
+            };
+            _context.Post.Add(NewPost);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetPost", new { id = post.IdPost }, post);

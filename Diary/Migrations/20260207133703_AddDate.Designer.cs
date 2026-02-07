@@ -4,6 +4,7 @@ using Diary.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Diary.Migrations
 {
     [DbContext(typeof(MoodDiaryDBContext))]
-    partial class MoodDiaryDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260207133703_AddDate")]
+    partial class AddDate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,7 +55,9 @@ namespace Diary.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("PostDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2026, 2, 7, 16, 37, 2, 404, DateTimeKind.Local).AddTicks(3055));
 
                     b.Property<string>("PostText")
                         .IsRequired()
