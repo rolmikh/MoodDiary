@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Diary;
+using Diary.Models;
+using Diary.DTO;
 
 namespace Diary.Controllers
 {
@@ -22,16 +23,34 @@ namespace Diary.Controllers
 
         // GET: api/Posts
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Post>>> GetPosts()
+        public async Task<ActionResult<IEnumerable<Post>>> GetPost()
         {
-            return await _context.Posts.ToListAsync();
+            return await _context.Post.ToListAsync();
+        }
+
+        [HttpGet("select")]
+        public async Task<List<PostDTO>> SelectPost()
+        {
+            var query = from post in _context.Post
+                         join emoji in _context.Emoji
+                         on post.EmojiId equals emoji.IdEmoji
+                         select new PostDTO
+                         {
+                           PostText = post.PostText,
+                           NameEmoji = emoji.NameEmoji,
+                         };
+
+            var result = await query.ToListAsync();
+
+            return result;
+
         }
 
         // GET: api/Posts/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Post>> GetPost(int id)
         {
-            var post = await _context.Posts.FindAsync(id);
+            var post = await _context.Post.FindAsync(id);
 
             if (post == null)
             {
@@ -77,7 +96,7 @@ namespace Diary.Controllers
         [HttpPost]
         public async Task<ActionResult<Post>> PostPost(Post post)
         {
-            _context.Posts.Add(post);
+            _context.Post.Add(post);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetPost", new { id = post.IdPost }, post);
@@ -87,13 +106,13 @@ namespace Diary.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePost(int id)
         {
-            var post = await _context.Posts.FindAsync(id);
+            var post = await _context.Post.FindAsync(id);
             if (post == null)
             {
                 return NotFound();
             }
 
-            _context.Posts.Remove(post);
+            _context.Post.Remove(post);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -101,7 +120,7 @@ namespace Diary.Controllers
 
         private bool PostExists(int id)
         {
-            return _context.Posts.Any(e => e.IdPost == id);
+            return _context.Post.Any(e => e.IdPost == id);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Diary
+namespace Diary.Models
 {
     public class Post
     {

@@ -1,25 +1,24 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Diary
+namespace Diary.Models
 {
     public class MoodDiaryDBContext : DbContext
     {
         public MoodDiaryDBContext(DbContextOptions<MoodDiaryDBContext> options) : base(options) { }
 
-        public virtual DbSet<Post> Posts { get; set; }
-        public virtual DbSet<Emoji> Emojis { get; set; }
+        public virtual DbSet<Post> Post { get; set; }
+        public virtual DbSet<Emoji> Emoji { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Post>(entity =>
             {
-                entity.ToTable(nameof(Posts));
+                entity.ToTable(nameof(Post));
 
                 entity.HasKey(e => e.IdPost);
 
                 entity.Property(e => e.PostText)
-                .IsRequired(true)
-                .HasMaxLength(100);
+                .IsRequired(true);
 
                 entity.Property(e => e.EmojiId)
                 .IsRequired(true);
@@ -33,7 +32,7 @@ namespace Diary
 
             modelBuilder.Entity<Emoji>(entity =>
             {
-                entity.ToTable(nameof(Emojis));
+                entity.ToTable(nameof(Emoji));
 
                 entity.HasKey(e => e.IdEmoji);
 

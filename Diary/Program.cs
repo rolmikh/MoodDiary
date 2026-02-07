@@ -1,4 +1,4 @@
-using Diary;
+using Diary.Models;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +7,9 @@ IConfiguration configuration = builder.Configuration;
 
 var connection = configuration.GetConnectionString("con");
 builder.Services.AddDbContext<MoodDiaryDBContext>(options => options.UseSqlServer(connection));
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // Add services to the container.
 
@@ -20,7 +23,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"));
 }
+
+
 
 app.UseHttpsRedirection();
 

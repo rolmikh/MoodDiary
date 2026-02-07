@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Diary;
+using Diary.Models;
 
 namespace Diary.Controllers
 {
@@ -22,16 +22,16 @@ namespace Diary.Controllers
 
         // GET: api/Emojis
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Emoji>>> GetEmojis()
+        public async Task<ActionResult<IEnumerable<Emoji>>> GetEmoji()
         {
-            return await _context.Emojis.ToListAsync();
+            return await _context.Emoji.ToListAsync();
         }
 
         // GET: api/Emojis/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Emoji>> GetEmoji(int id)
         {
-            var emoji = await _context.Emojis.FindAsync(id);
+            var emoji = await _context.Emoji.FindAsync(id);
 
             if (emoji == null)
             {
@@ -77,7 +77,7 @@ namespace Diary.Controllers
         [HttpPost]
         public async Task<ActionResult<Emoji>> PostEmoji(Emoji emoji)
         {
-            _context.Emojis.Add(emoji);
+            _context.Emoji.Add(emoji);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetEmoji", new { id = emoji.IdEmoji }, emoji);
@@ -87,13 +87,13 @@ namespace Diary.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEmoji(int id)
         {
-            var emoji = await _context.Emojis.FindAsync(id);
+            var emoji = await _context.Emoji.FindAsync(id);
             if (emoji == null)
             {
                 return NotFound();
             }
 
-            _context.Emojis.Remove(emoji);
+            _context.Emoji.Remove(emoji);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -101,7 +101,7 @@ namespace Diary.Controllers
 
         private bool EmojiExists(int id)
         {
-            return _context.Emojis.Any(e => e.IdEmoji == id);
+            return _context.Emoji.Any(e => e.IdEmoji == id);
         }
     }
 }

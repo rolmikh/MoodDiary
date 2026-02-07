@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Diary.Migrations
 {
     [DbContext(typeof(MoodDiaryDBContext))]
-    [Migration("20260204165833_Initial")]
-    partial class Initial
+    [Migration("20260205122846_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,7 +39,7 @@ namespace Diary.Migrations
 
                     b.HasKey("IdEmoji");
 
-                    b.ToTable("Emojis", (string)null);
+                    b.ToTable("Emoji", (string)null);
                 });
 
             modelBuilder.Entity("Diary.Post", b =>
@@ -62,7 +62,7 @@ namespace Diary.Migrations
 
                     b.HasIndex("EmojiId");
 
-                    b.ToTable("Posts", (string)null);
+                    b.ToTable("Post", (string)null);
                 });
 
             modelBuilder.Entity("Diary.Post", b =>
