@@ -18,12 +18,12 @@ namespace Diary.Models
                 entity.HasKey(e => e.IdPost);
 
                 entity.Property(e => e.PostText)
-                .IsRequired(true);
+                .IsRequired(false);
 
                 entity.Property(e => e.EmojiId)
                 .IsRequired(true);
 
-                entity.Property(e => e.PostDate);
+                entity.Property(e => e.CreatedAt);
 
                 entity.HasOne(e => e.Emoji)
                 .WithMany(t => t.Posts)
@@ -41,6 +41,11 @@ namespace Diary.Models
                 entity.Property(e => e.NameEmoji)
                 .IsRequired(true)
                 .HasMaxLength(100);
+
+                entity.Property(e => e.CodeEmoji)
+                .IsRequired(true);
+
+                entity.Property(e => e.IsPositive);
 
             });
         }

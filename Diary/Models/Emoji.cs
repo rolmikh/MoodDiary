@@ -6,6 +6,8 @@ namespace Diary.Models
     {
         public int IdEmoji { get; set; }
         public string? NameEmoji { get; set; }
+        public string? CodeEmoji { get; set; }
+        public bool? IsPositive { get; set; }
 
         [JsonIgnore]
         public ICollection<Post>? Posts { get; set; }  

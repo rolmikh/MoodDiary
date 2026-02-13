@@ -12,7 +12,7 @@ namespace Diary.DTO
         public int EmojiId { get; set; }
 
         [JsonIgnore]
-        public DateTime PostDate { get; set; }
+        public DateTime CreatedAt { get; set; }
 
     }
 }

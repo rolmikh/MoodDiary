@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Diary.Models;
 using Diary.DTO;
+using Diary.Services.Interfaces;
 
 namespace Diary.Controllers
 {
@@ -14,79 +15,47 @@ namespace Diary.Controllers
     [ApiController]
     public class PostsController : ControllerBase
     {
-        private readonly MoodDiaryDBContext _context;
+        private readonly IPostService _postService;
 
-        public PostsController(MoodDiaryDBContext context)
+        public PostsController(IPostService postService)
         {
-            _context = context;
+            _postService = postService;
         }
 
-        // GET: api/Posts
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Post>>> GetPost()
-        {
-            return await _context.Post.ToListAsync();
-        }
-
+        
         [HttpGet("select")]
-        public async Task<List<PostDTO>> SelectPost()
+        public async Task<List<PostDTO>> SelectPost(IPostService postService)
         {
-            var query = from post in _context.Post
-                         join emoji in _context.Emoji
-                         on post.EmojiId equals emoji.IdEmoji
-                         select new PostDTO
-                         {
-                           PostText = post.PostText,
-                           NameEmoji = emoji.NameEmoji,
-                           PostDate = post.PostDate,
-                         };
-
-            var result = await query.ToListAsync();
-
-            return result;
-
+           return await postService.SelectPost();
         }
 
-        // GET: api/Posts/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Post>> GetPost(int id)
+        [HttpGet("filtration")]
+        public async Task<List<PostDTO>> FiltrationPost(int id, IPostService postService)
         {
-            var post = await _context.Post.FindAsync(id);
+            return await postService.FiltrationPost(id);
+        }
 
-            if (post == null)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Post>> GetPost(int id, IPostService postService)
+        {
+           var result = await postService.GetPost(id);
+
+            if (result == null)
             {
                 return NotFound();
             }
 
-            return post;
+            return result;
         }
 
-        // PUT: api/Posts/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPost(int id, Post post)
+        public async Task<IActionResult> PutPost(int id, Post post, IPostService postService)
         {
-            if (id != post.IdPost)
-            {
-                return BadRequest();
-            }
+            var result = await postService.PutPost(id, post);
 
-            _context.Entry(post).State = EntityState.Modified;
-
-            try
+            if (!result)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PostExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound();
             }
 
             return NoContent();
@@ -95,41 +64,26 @@ namespace Diary.Controllers
         // POST: api/Posts
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Post>> PostPost(CreatePostDTO post)
+        public async Task<ActionResult<Post>> PostNewPost(CreatePostDTO post, IPostService postService)
         {
-            post.PostDate = DateTime.Now;
-
-            Post NewPost = new Post {
-                IdPost = post.IdPost,
-                PostText = post.PostText,
-                PostDate = post.PostDate,
-                EmojiId = post.EmojiId,
-            };
-            _context.Post.Add(NewPost);
-            await _context.SaveChangesAsync();
-
+            await postService.PostNewPost(post);
+           
             return CreatedAtAction("GetPost", new { id = post.IdPost }, post);
         }
 
-        // DELETE: api/Posts/5
+
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePost(int id)
+        public async Task<IActionResult> DeletePost(int id, IPostService postService)
         {
-            var post = await _context.Post.FindAsync(id);
-            if (post == null)
+           var result = await postService.DeletePost(id);
+            if (!result)
             {
                 return NotFound();
             }
 
-            _context.Post.Remove(post);
-            await _context.SaveChangesAsync();
-
             return NoContent();
         }
 
-        private bool PostExists(int id)
-        {
-            return _context.Post.Any(e => e.IdPost == id);
-        }
+       
     }
 }

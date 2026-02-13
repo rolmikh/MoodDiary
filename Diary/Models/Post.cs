@@ -8,7 +8,7 @@ namespace Diary.Models
         public int IdPost { get; set; }
         public string? PostText { get; set; }
         public int EmojiId { get; set; }
-        public DateTime PostDate { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         [JsonIgnore]
         public Emoji? Emoji { get; set; }
