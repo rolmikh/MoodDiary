@@ -8,6 +8,7 @@ namespace Diary.Models
 
         public virtual DbSet<Post> Post { get; set; }
         public virtual DbSet<Emoji> Emoji { get; set; }
+        public virtual DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -22,6 +23,9 @@ namespace Diary.Models
 
                 entity.Property(e => e.EmojiId)
                 .IsRequired(true);
+
+                entity.Property(e => e.UserId)
+                .IsRequired(false);
 
                 entity.Property(e => e.CreatedAt);
 
@@ -46,6 +50,32 @@ namespace Diary.Models
                 .IsRequired(true);
 
                 entity.Property(e => e.IsPositive);
+
+            });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.ToTable(nameof(User));
+
+                entity.HasKey(e => e.IdUser);
+
+                entity.Property(e => e.UserName)
+                .IsRequired(true)
+                .HasMaxLength(100);
+
+                entity.Property(e => e.CreatedAt)
+                .IsRequired(true);
+
+                entity.Property(e => e.BirthdayDate)
+                .IsRequired(true);
+
+                entity.Property(e => e.Email)
+                .IsRequired(true);
+
+                entity.Property(e => e.Password)
+                .IsRequired(true);
+
+                
 
             });
         }

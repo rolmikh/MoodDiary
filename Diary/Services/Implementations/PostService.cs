@@ -69,28 +69,36 @@ namespace Diary.Services.Implementations
         {
             post.CreatedAt = DateTime.Now;
 
-            Post NewPost = new Post
+            Post newPost = new Post
             {
-                IdPost = post.IdPost,
                 PostText = post.PostText,
                 CreatedAt = post.CreatedAt,
                 EmojiId = post.EmojiId,
             };
-            _context.Post.Add(NewPost);
+            _context.Post.Add(newPost);
             await _context.SaveChangesAsync();
 
-            return NewPost;
+            return newPost;
         }
 
-        public async Task<bool> PutPost(int id, Post post)
+        public async Task<bool> PutPost(int id, UpdatePostDTO updatePost)
         {
+            var post = await _context.Post.FindAsync(id);
 
-            if (id != post.IdPost)
+            if (post == null)
             {
                 return false;
             }
 
-            _context.Entry(post).State = EntityState.Modified;
+            if (updatePost.PostText != null)
+            {
+                post.PostText = updatePost.PostText;
+            }
+
+            if (updatePost.EmojiId.HasValue)
+            {
+                post.EmojiId = updatePost.EmojiId.Value;
+            }
 
             try
             {

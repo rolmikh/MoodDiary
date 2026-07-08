@@ -1,11 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Diary.DTO;
+using Diary.Models;
+using Diary.Services.Implementations;
+using Diary.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Diary.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Diary.Controllers
 {
@@ -13,95 +16,68 @@ namespace Diary.Controllers
     [ApiController]
     public class EmojisController : ControllerBase
     {
-        private readonly MoodDiaryDBContext _context;
+        private readonly IEmojiService _emojiService;
 
-        public EmojisController(MoodDiaryDBContext context)
+        public EmojisController(IEmojiService emojiService)
         {
-            _context = context;
+            _emojiService = emojiService;
         }
 
-        // GET: api/Emojis
+
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Emoji>>> GetEmoji()
+        public async Task<List<Emoji>> GetEmoji()
         {
-            return await _context.Emoji.ToListAsync();
+            return await _emojiService.SelectEmoji();
         }
 
-        // GET: api/Emojis/5
+
         [HttpGet("{id}")]
         public async Task<ActionResult<Emoji>> GetEmoji(int id)
         {
-            var emoji = await _context.Emoji.FindAsync(id);
+            var result = await _emojiService.GetEmoji(id);
 
-            if (emoji == null)
+            if (result == null)
             {
                 return NotFound();
             }
 
-            return emoji;
+            return result;
         }
 
-        // PUT: api/Emojis/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmoji(int id, Emoji emoji)
+        public async Task<IActionResult> PutEmoji(int id, UpdateEmojiDTO updateEmoji)
         {
-            if (id != emoji.IdEmoji)
-            {
-                return BadRequest();
-            }
+            var result = await _emojiService.PutEmoji(id, updateEmoji);
 
-            _context.Entry(emoji).State = EntityState.Modified;
-
-            try
+            if (!result)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!EmojiExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound();
             }
 
             return NoContent();
         }
 
-        // POST: api/Emojis
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        
         [HttpPost]
-        public async Task<ActionResult<Emoji>> PostEmoji(Emoji emoji)
+        public async Task<ActionResult<Emoji>> PostNewEmoji(CreateEmojiDTO emoji)
         {
-            _context.Emoji.Add(emoji);
-            await _context.SaveChangesAsync();
+            await _emojiService.PostNewEmoji(emoji);
 
             return CreatedAtAction("GetEmoji", new { id = emoji.IdEmoji }, emoji);
         }
 
-        // DELETE: api/Emojis/5
+        
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEmoji(int id)
         {
-            var emoji = await _context.Emoji.FindAsync(id);
-            if (emoji == null)
+            var result = await _emojiService.DeleteEmoji(id);
+            if (!result)
             {
                 return NotFound();
             }
 
-            _context.Emoji.Remove(emoji);
-            await _context.SaveChangesAsync();
-
             return NoContent();
-        }
-
-        private bool EmojiExists(int id)
-        {
-            return _context.Emoji.Any(e => e.IdEmoji == id);
         }
     }
 }

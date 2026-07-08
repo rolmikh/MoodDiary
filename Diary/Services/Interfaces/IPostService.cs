@@ -15,7 +15,7 @@ namespace Diary.Services.Interfaces
 
         Task<Post> PostNewPost(CreatePostDTO post);
 
-        Task<bool> PutPost(int id, Post post);
+        Task<bool> PutPost(int id, UpdatePostDTO updatePost);
 
         Task<bool> DeletePost(int id);
 

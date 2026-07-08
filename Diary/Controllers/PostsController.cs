@@ -24,21 +24,21 @@ namespace Diary.Controllers
 
         
         [HttpGet("select")]
-        public async Task<List<PostDTO>> SelectPost(IPostService postService)
+        public async Task<List<PostDTO>> SelectPost()
         {
-           return await postService.SelectPost();
+           return await _postService.SelectPost();
         }
 
         [HttpGet("filtration")]
-        public async Task<List<PostDTO>> FiltrationPost(int id, IPostService postService)
+        public async Task<List<PostDTO>> FiltrationPost(int id)
         {
-            return await postService.FiltrationPost(id);
+            return await _postService.FiltrationPost(id);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Post>> GetPost(int id, IPostService postService)
+        public async Task<ActionResult<Post>> GetPost(int id)
         {
-           var result = await postService.GetPost(id);
+           var result = await _postService.GetPost(id);
 
             if (result == null)
             {
@@ -49,9 +49,9 @@ namespace Diary.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPost(int id, Post post, IPostService postService)
+        public async Task<IActionResult> PutPost(int id, UpdatePostDTO updatePost)
         {
-            var result = await postService.PutPost(id, post);
+            var result = await _postService.PutPost(id, updatePost);
 
             if (!result)
             {
@@ -61,21 +61,19 @@ namespace Diary.Controllers
             return NoContent();
         }
 
-        // POST: api/Posts
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Post>> PostNewPost(CreatePostDTO post, IPostService postService)
+        public async Task<ActionResult<Post>> PostNewPost(CreatePostDTO post)
         {
-            await postService.PostNewPost(post);
+            await _postService.PostNewPost(post);
            
             return CreatedAtAction("GetPost", new { id = post.IdPost }, post);
         }
 
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePost(int id, IPostService postService)
+        public async Task<IActionResult> DeletePost(int id)
         {
-           var result = await postService.DeletePost(id);
+           var result = await _postService.DeletePost(id);
             if (!result)
             {
                 return NotFound();
