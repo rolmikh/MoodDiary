@@ -24,15 +24,15 @@ namespace Diary.Controllers
         }
 
 
-        [HttpGet]
-        public async Task<List<Emoji>> GetEmoji()
+        [HttpGet("select")]
+        public async Task<List<EmojiDTO>> SelectEmojis()
         {
             return await _emojiService.SelectEmoji();
         }
 
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Emoji>> GetEmoji(int id)
+        public async Task<ActionResult<EmojiDTO?>> GetEmoji(int id)
         {
             var result = await _emojiService.GetEmoji(id);
 
@@ -60,11 +60,11 @@ namespace Diary.Controllers
 
         
         [HttpPost]
-        public async Task<ActionResult<Emoji>> PostNewEmoji(CreateEmojiDTO emoji)
+        public async Task<ActionResult> PostNewEmoji(CreateEmojiDTO emoji)
         {
             await _emojiService.PostNewEmoji(emoji);
 
-            return CreatedAtAction("GetEmoji", new { id = emoji.IdEmoji }, emoji);
+            return Ok();
         }
 
         

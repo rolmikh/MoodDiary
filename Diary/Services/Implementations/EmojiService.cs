@@ -15,33 +15,39 @@ namespace Diary.Services.Implementations
             _context = context;
         }
 
-        public async Task<List<Emoji>> SelectEmoji()
+        public async Task<List<EmojiDTO>> SelectEmoji()
         {
-            var result = await _context.Emoji.ToListAsync();
+            var query = from emoji in _context.Emoji
+                        select new EmojiDTO
+                        {
+                            NameEmoji = emoji.NameEmoji,
+                            CodeEmoji = emoji.CodeEmoji,
+                            IsPositive = emoji.IsPositive,
+                        };
+
+            var result = await query.ToListAsync();
             return result;
         }
 
 
-        public async Task<Emoji> GetEmoji(int id)
+        public async Task<EmojiDTO?> GetEmoji(int id)
         {
-            var emoji = await _context.Emoji.FindAsync(id);
 
-            if (emoji == null)
-            {
-                return null;
-            }
+            var result = await _context.Emoji
+                .Where(emoji => emoji.IdEmoji == id)
+                .Select(emoji => new EmojiDTO{
+                    NameEmoji = emoji.NameEmoji,
+                    CodeEmoji = emoji.CodeEmoji,
+                    IsPositive = emoji.IsPositive,
+                })
+                .FirstOrDefaultAsync();
 
-            return emoji;
+            return result;
         }
 
         public async Task<Emoji> PostNewEmoji(CreateEmojiDTO emoji)
         {
-            Emoji newEmoji = new Emoji
-            {
-                NameEmoji = emoji.NameEmoji,
-                CodeEmoji = emoji.CodeEmoji,
-                IsPositive = emoji.IsPositive,
-            };
+            Emoji newEmoji = new Emoji(emoji.NameEmoji, emoji.CodeEmoji, emoji.IsPositive);
             _context.Emoji.Add(newEmoji);
             await _context.SaveChangesAsync();
 
@@ -56,20 +62,7 @@ namespace Diary.Services.Implementations
 
             if (emoji == null) { return false; }
 
-            if (updateEmoji.NameEmoji != null)
-            {
-                emoji.NameEmoji = updateEmoji.NameEmoji;
-            }
-
-            if (updateEmoji.CodeEmoji != null)
-            {
-                emoji.CodeEmoji = updateEmoji.CodeEmoji;
-            }
-
-            if (updateEmoji.IsPositive != null)
-            {
-                emoji.IsPositive = updateEmoji.IsPositive;
-            }
+            emoji.Update(updateEmoji.NameEmoji, updateEmoji.CodeEmoji, updateEmoji.IsPositive);
 
             try
             {

@@ -6,9 +6,9 @@ namespace Diary.Services.Interfaces
     public interface IEmojiService
     {
 
-        Task<List<Emoji>> SelectEmoji();
+        Task<List<EmojiDTO>> SelectEmoji();
 
-        Task<Emoji> GetEmoji(int id);
+        Task<EmojiDTO?> GetEmoji(int id);
 
         Task<Emoji> PostNewEmoji(CreateEmojiDTO emoji);
 

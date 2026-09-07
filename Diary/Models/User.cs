@@ -4,7 +4,7 @@ namespace Diary.Models
 {
     public class User
     {
-        public int IdUser { get; set; }
+        public int IdUser { get; private set; }
 
         public string? UserName { get; set; }
 
@@ -17,7 +17,7 @@ namespace Diary.Models
         public string? Password { get; set; }
 
         [JsonIgnore]
-        public ICollection<User>? Users { get; set; }
+        public ICollection<User>? Users { get;private set; }
 
     }
 }
