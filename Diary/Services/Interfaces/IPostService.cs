@@ -11,7 +11,7 @@ namespace Diary.Services.Interfaces
 
         Task<List<PostDTO>> FiltrationPost(int id);
 
-        Task<Post> GetPost(int id);
+        Task<PostDTO?> GetPost(int id);
 
         Task<Post> PostNewPost(CreatePostDTO post);
 

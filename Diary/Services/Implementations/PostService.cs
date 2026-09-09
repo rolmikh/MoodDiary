@@ -53,28 +53,27 @@ namespace Diary.Services.Implementations
         }
 
 
-        public async Task<Post> GetPost(int id)
+        public async Task<PostDTO?> GetPost(int id)
         {
-            var post = await _context.Post.FindAsync(id);
+            var query = from post in _context.Post
+                        join emoji in _context.Emoji
+                        on post.EmojiId equals emoji.IdEmoji
+                        where emoji.IdEmoji == id
+                        select new PostDTO
+                        {
+                            PostText = post.PostText,
+                            NameEmoji = emoji.NameEmoji,
+                            CreatedAt = post.CreatedAt,
+                        };
 
-            if (post == null)
-            {
-                return null;
-            }
+            var result = await query.FirstOrDefaultAsync();
 
-            return post;
+            return result;
         }
 
         public async Task<Post> PostNewPost(CreatePostDTO post)
         {
-            post.CreatedAt = DateTime.Now;
-
-            Post newPost = new Post
-            {
-                PostText = post.PostText,
-                CreatedAt = post.CreatedAt,
-                EmojiId = post.EmojiId,
-            };
+            Post newPost = new Post(post.PostText, post.EmojiId, 1);
             _context.Post.Add(newPost);
             await _context.SaveChangesAsync();
 
@@ -90,15 +89,7 @@ namespace Diary.Services.Implementations
                 return false;
             }
 
-            if (updatePost.PostText != null)
-            {
-                post.PostText = updatePost.PostText;
-            }
-
-            if (updatePost.EmojiId.HasValue)
-            {
-                post.EmojiId = updatePost.EmojiId.Value;
-            }
+            post.Update(updatePost.PostText, updatePost.EmojiId);
 
             try
             {

@@ -36,7 +36,7 @@ namespace Diary.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Post>> GetPost(int id)
+        public async Task<ActionResult<PostDTO>> GetPost(int id)
         {
            var result = await _postService.GetPost(id);
 
@@ -66,7 +66,7 @@ namespace Diary.Controllers
         {
             await _postService.PostNewPost(post);
            
-            return CreatedAtAction("GetPost", new { id = post.IdPost }, post);
+            return Ok();
         }
 
 

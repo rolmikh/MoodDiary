@@ -12,6 +12,7 @@ builder.Services.AddDbContext<MoodDiaryDBContext>(options => options.UseSqlServe
 
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IEmojiService, EmojiService>();
+//builder.Services.AddScoped<IUserService, UserService>();
 
 
 builder.Services.AddEndpointsApiExplorer();

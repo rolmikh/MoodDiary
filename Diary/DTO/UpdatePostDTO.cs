@@ -5,6 +5,6 @@
 
         public string? PostText { get; set; }
 
-        public int? EmojiId { get; set; }
+        public int EmojiId { get; set; }
     }
 }

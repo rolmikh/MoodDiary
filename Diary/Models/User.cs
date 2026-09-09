@@ -6,18 +6,26 @@ namespace Diary.Models
     {
         public int IdUser { get; private set; }
 
-        public string? UserName { get; set; }
+        public string? UserName { get; private set; }
 
-        public DateTime? CreatedAt { get; set; }
+        public DateTime CreatedAt { get; private set; }
 
-        public DateTime? BirthdayDate { get; set; }
+        public DateTime? BirthdayDate { get; private set; }
 
-        public string? Email { get; set; }
+        public string Email { get; private set; }
 
-        public string? Password { get; set; }
+        public string Password { get; private set; }
 
         [JsonIgnore]
-        public ICollection<User>? Users { get;private set; }
+        public ICollection<Post>? Posts { get;private set; }
+
+        public User(string email, string password)
+        {
+            Email = email;
+            Password = password;
+            CreatedAt = DateTime.UtcNow;
+
+        }
 
     }
 }
