@@ -60,14 +60,14 @@ namespace Diary.Models
                 entity.HasKey(e => e.IdUser);
 
                 entity.Property(e => e.UserName)
-                .IsRequired(true)
+                .IsRequired(false)
                 .HasMaxLength(100);
 
                 entity.Property(e => e.CreatedAt)
                 .IsRequired(true);
 
                 entity.Property(e => e.BirthdayDate)
-                .IsRequired(true);
+                .IsRequired(false);
 
                 entity.Property(e => e.Email)
                 .IsRequired(true);

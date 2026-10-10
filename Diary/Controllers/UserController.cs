@@ -19,14 +19,23 @@ namespace Diary.Controllers
         [HttpPost("registration")]
         public async Task<ActionResult> Registration(UserRegistrationDTO user)
         {
-            await _userService.Registration(user);
+            var result = await _userService.Registration(user);
+            if (!result)
+            {
+                return BadRequest(new { error = "Пользователь с таким Email существует" });
+            }
             return Ok();
 
         }
 
         [HttpPost("authorization")]
-        public async Task<ActionResult> Authorization(UserRegistrationDTO user)
+        public async Task<ActionResult> Authorization(AuthorizationDTO authUser)
         {
+           var result = await _userService.Authorization(authUser);
+            if (!result)
+            {
+                return BadRequest(new { error = "Ошибка авторизации" });
+            }
             return Ok();
         }
 

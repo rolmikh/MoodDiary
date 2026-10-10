@@ -84,7 +84,7 @@ namespace Diary.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdUser"));
 
-                    b.Property<DateTime>("BirthdayDate")
+                    b.Property<DateTime?>("BirthdayDate")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("CreatedAt")
@@ -98,17 +98,11 @@ namespace Diary.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserIdUser")
-                        .HasColumnType("int");
-
                     b.Property<string>("UserName")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("IdUser");
-
-                    b.HasIndex("UserIdUser");
 
                     b.ToTable("User", (string)null);
                 });
@@ -122,19 +116,12 @@ namespace Diary.Migrations
                         .IsRequired();
 
                     b.HasOne("Diary.Models.User", "User")
-                        .WithMany()
+                        .WithMany("Posts")
                         .HasForeignKey("UserId");
 
                     b.Navigation("Emoji");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Diary.Models.User", b =>
-                {
-                    b.HasOne("Diary.Models.User", null)
-                        .WithMany("Users")
-                        .HasForeignKey("UserIdUser");
                 });
 
             modelBuilder.Entity("Diary.Models.Emoji", b =>
@@ -144,7 +131,7 @@ namespace Diary.Migrations
 
             modelBuilder.Entity("Diary.Models.User", b =>
                 {
-                    b.Navigation("Users");
+                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }

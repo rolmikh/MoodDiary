@@ -6,8 +6,8 @@ namespace Diary.Services.Interfaces
     public interface IUserService
     {
 
-        Task<User> Registration(UserRegistrationDTO user);
+        Task<bool> Registration(UserRegistrationDTO user);
 
-        //Task<User> Authorization(UserRegistrationDTO user);
+        Task<bool> Authorization(AuthorizationDTO user);
     }
 }
