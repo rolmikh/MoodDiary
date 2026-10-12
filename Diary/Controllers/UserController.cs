@@ -20,9 +20,9 @@ namespace Diary.Controllers
         public async Task<ActionResult> Registration(UserRegistrationDTO user)
         {
             var result = await _userService.Registration(user);
-            if (!result)
+            if (!result.IsSuccess)
             {
-                return BadRequest(new { error = "Пользователь с таким Email существует" });
+                return BadRequest(new { error = result.Error});
             }
             return Ok();
 

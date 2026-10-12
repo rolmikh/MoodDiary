@@ -2,8 +2,9 @@
 using Diary.Models;
 using Diary.Services.Interfaces;
 using Diary.Validators;
+using FluentValidation.Results;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 
 namespace Diary.Services.Implementations
 {
@@ -16,19 +17,40 @@ namespace Diary.Services.Implementations
             _dbContext = context;
         
         }
-        public async Task<bool> Registration(UserRegistrationDTO user)
+        public async Task<ServiceResult> Registration(UserRegistrationDTO user)
         {
+
+            UserRegistrationValidator validations = new UserRegistrationValidator();
+            ValidationResult result = validations.Validate(user);
+
+            if (!result.IsValid)
+            {
+                return new ServiceResult 
+                { 
+                    IsSuccess = false,
+                    Error = string.Join("; ", result.Errors.Select(e => e.ErrorMessage))
+                
+                };
+            }
             var findUser = _dbContext.Users.Where(n => n.Email == user.Email);
             if (findUser.Any())
             {
-                return false;
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    Error = "Пользователь с таким Email уже существует"
+
+                };
             }
             
             User newUser = new User(user.Email, user.Password);
             _dbContext.Users.Add(newUser);
             await _dbContext.SaveChangesAsync();
 
-            return true;
+            return new ServiceResult
+            {
+                IsSuccess = true
+            };
         }
 
         public async Task<bool> Authorization(AuthorizationDTO user)

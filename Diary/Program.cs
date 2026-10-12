@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 IConfiguration configuration = builder.Configuration;
 
 var connection = configuration.GetConnectionString("con");
-builder.Services.AddDbContext<MoodDiaryDBContext>(options => options.UseSqlServer(connection));
+builder.Services.AddDbContext<MoodDiaryDBContext>(options => options.UseNpgsql(connection));
 
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IEmojiService, EmojiService>();
