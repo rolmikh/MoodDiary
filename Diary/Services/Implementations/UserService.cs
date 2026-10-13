@@ -14,13 +14,15 @@ namespace Diary.Services.Implementations
         private readonly MoodDiaryDBContext _dbContext;
         private readonly IValidator<UserRegistrationDTO> _registration_validator;
         private readonly IValidator<AuthorizationDTO> _authorization_validator;
-        
 
-        public UserService(MoodDiaryDBContext context, IValidator<UserRegistrationDTO> registration_validator, IValidator<AuthorizationDTO> authorization_validator) 
+        private readonly PasswordHasher<User> _passwordHasher;
+
+        public UserService(MoodDiaryDBContext context, IValidator<UserRegistrationDTO> registration_validator, IValidator<AuthorizationDTO> authorization_validator, PasswordHasher<User> passwordHasher) 
         {
             _dbContext = context;
             _registration_validator = registration_validator;
             _authorization_validator = authorization_validator;
+            _passwordHasher = passwordHasher;
         
         }
         public async Task<ServiceResult> Registration(UserRegistrationDTO user)
@@ -48,7 +50,12 @@ namespace Diary.Services.Implementations
                 };
             }
             
-            User newUser = new User(user.Email, user.Password);
+            User newUser = new User(user.Email);
+
+            string passwordHash = _passwordHasher.HashPassword(newUser, user.Password);
+
+            newUser.SetPasswordHash(passwordHash);
+
             _dbContext.Users.Add(newUser);
             await _dbContext.SaveChangesAsync();
 
@@ -72,22 +79,39 @@ namespace Diary.Services.Implementations
                 };
             }
 
-            var searchUser = _dbContext.Users.Where(n => n.Email == user.Email && n.Password == user.Password);
+            var foundUser =  await _dbContext.Users.FirstOrDefaultAsync(n => n.Email == user.Email);
 
-            if (searchUser.Any()) 
+            if (foundUser == null) 
+            {
+
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    Error = "Неверный Email"
+
+                };
+ 
+            }
+
+            var result_password = _passwordHasher.VerifyHashedPassword(foundUser, foundUser.Password, user.Password);
+
+
+            if (result_password == PasswordVerificationResult.Failed)
             {
                 return new ServiceResult
                 {
-                    IsSuccess = true
+                    IsSuccess = false,
+                    Error = "Неверный пароль"
+
                 };
             }
-            
+
             return new ServiceResult
             {
-                IsSuccess = false,
-                Error = "Пользователя не существует"
-
+                IsSuccess = true
             };
+            
+            
 
         }
     }

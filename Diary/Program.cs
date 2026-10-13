@@ -4,6 +4,7 @@ using Diary.Services.Implementations;
 using Diary.Services.Interfaces;
 using Diary.Validators;
 using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,8 +19,10 @@ builder.Services.AddScoped<IEmojiService, EmojiService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<IValidator<AuthorizationDTO>, UserAuthorizationValidator>();
-builder.Services.AddScoped<IValidator<UserRegistrationDTO>, UserRegistrationValidator>();  
+builder.Services.AddScoped<IValidator<UserRegistrationDTO>, UserRegistrationValidator>();
 
+
+builder.Services.AddScoped<PasswordHasher<User>>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

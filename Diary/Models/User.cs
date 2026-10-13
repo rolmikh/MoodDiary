@@ -19,12 +19,16 @@ namespace Diary.Models
         [JsonIgnore]
         public ICollection<Post>? Posts { get;private set; }
 
-        public User(string email, string password)
+        public User(string email)
         {
             Email = email;
-            Password = password;
             CreatedAt = DateTime.UtcNow;
 
+        }
+
+        public void SetPasswordHash(string passwordHash)
+        {
+            Password = passwordHash;
         }
 
     }
