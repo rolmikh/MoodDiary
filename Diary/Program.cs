@@ -1,6 +1,9 @@
+using Diary.DTO;
 using Diary.Models;
 using Diary.Services.Implementations;
 using Diary.Services.Interfaces;
+using Diary.Validators;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +17,8 @@ builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IEmojiService, EmojiService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+builder.Services.AddScoped<IValidator<AuthorizationDTO>, UserAuthorizationValidator>();
+builder.Services.AddScoped<IValidator<UserRegistrationDTO>, UserRegistrationValidator>();  
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

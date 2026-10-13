@@ -32,9 +32,9 @@ namespace Diary.Controllers
         public async Task<ActionResult> Authorization(AuthorizationDTO authUser)
         {
            var result = await _userService.Authorization(authUser);
-            if (!result)
+            if (!result.IsSuccess)
             {
-                return BadRequest(new { error = "Ошибка авторизации" });
+                return BadRequest(new { error = result.Error});
             }
             return Ok();
         }

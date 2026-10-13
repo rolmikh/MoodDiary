@@ -1,5 +1,4 @@
 ﻿using Diary.DTO;
-using Diary.Models;
 using FluentValidation;
 
 namespace Diary.Validators
@@ -10,10 +9,15 @@ namespace Diary.Validators
         {
             RuleFor(user => user.Email)
                 .NotEmpty()
-                .EmailAddress();
+                    .WithMessage("Поле электронной почты должно быть заполнено")
+                .EmailAddress()
+                    .WithMessage("Поле должно соответствовать формату электронной почты") ;
 
             RuleFor(user => user.Password)
-                .NotEmpty();
+                .NotEmpty()
+                    .WithMessage("Поле пароля должно быть заполнено")
+                .MinimumLength(10)
+                    .WithMessage("Пароль должен быть не менее 10 символов");
 
         }
     }

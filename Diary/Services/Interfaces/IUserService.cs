@@ -8,6 +8,6 @@ namespace Diary.Services.Interfaces
 
         Task<ServiceResult> Registration(UserRegistrationDTO user);
 
-        Task<bool> Authorization(AuthorizationDTO user);
+        Task<ServiceResult> Authorization(AuthorizationDTO user);
     }
 }

@@ -2,6 +2,7 @@
 using Diary.Models;
 using Diary.Services.Interfaces;
 using Diary.Validators;
+using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -11,17 +12,21 @@ namespace Diary.Services.Implementations
     public class UserService : IUserService
     {
         private readonly MoodDiaryDBContext _dbContext;
+        private readonly IValidator<UserRegistrationDTO> _registration_validator;
+        private readonly IValidator<AuthorizationDTO> _authorization_validator;
+        
 
-        public UserService(MoodDiaryDBContext context) 
+        public UserService(MoodDiaryDBContext context, IValidator<UserRegistrationDTO> registration_validator, IValidator<AuthorizationDTO> authorization_validator) 
         {
             _dbContext = context;
+            _registration_validator = registration_validator;
+            _authorization_validator = authorization_validator;
         
         }
         public async Task<ServiceResult> Registration(UserRegistrationDTO user)
         {
 
-            UserRegistrationValidator validations = new UserRegistrationValidator();
-            ValidationResult result = validations.Validate(user);
+            var result = _registration_validator.Validate(user);
 
             if (!result.IsValid)
             {
@@ -53,15 +58,36 @@ namespace Diary.Services.Implementations
             };
         }
 
-        public async Task<bool> Authorization(AuthorizationDTO user)
+        public async Task<ServiceResult> Authorization(AuthorizationDTO user)
         {
+            var result = _authorization_validator.Validate(user);
+
+            if (!result.IsValid)
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    Error = string.Join("; ", result.Errors.Select(e => e.ErrorMessage))
+
+                };
+            }
+
             var searchUser = _dbContext.Users.Where(n => n.Email == user.Email && n.Password == user.Password);
 
             if (searchUser.Any()) 
             {
-                return true;
+                return new ServiceResult
+                {
+                    IsSuccess = true
+                };
             }
-            return false;
+            
+            return new ServiceResult
+            {
+                IsSuccess = false,
+                Error = "Пользователя не существует"
+
+            };
 
         }
     }
