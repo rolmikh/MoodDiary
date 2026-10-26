@@ -107,6 +107,37 @@ namespace Diary.Migrations
                     b.ToTable("User", (string)null);
                 });
 
+            modelBuilder.Entity("Diary.Models.UserVerificationToken", b =>
+                {
+                    b.Property<int>("IdUserVerificationToken")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdUserVerificationToken"));
+
+                    b.Property<DateTime>("ExpirationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("HashData")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("OperationType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("IdUserVerificationToken");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserVerificationToken", (string)null);
+                });
+
             modelBuilder.Entity("Diary.Models.Post", b =>
                 {
                     b.HasOne("Diary.Models.Emoji", "Emoji")
@@ -117,9 +148,21 @@ namespace Diary.Migrations
 
                     b.HasOne("Diary.Models.User", "User")
                         .WithMany("Posts")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Emoji");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Diary.Models.UserVerificationToken", b =>
+                {
+                    b.HasOne("Diary.Models.User", "User")
+                        .WithMany("UserVerificationTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -132,6 +175,8 @@ namespace Diary.Migrations
             modelBuilder.Entity("Diary.Models.User", b =>
                 {
                     b.Navigation("Posts");
+
+                    b.Navigation("UserVerificationTokens");
                 });
 #pragma warning restore 612, 618
         }

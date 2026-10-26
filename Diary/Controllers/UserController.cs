@@ -10,10 +10,12 @@ namespace Diary.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IEmailService emailService)
         {
             _userService = userService;
+            _emailService = emailService;
         }
 
         [HttpPost("registration")]
@@ -37,6 +39,16 @@ namespace Diary.Controllers
                 return BadRequest(new { error = result.Error});
             }
             return Ok();
+        }
+
+        [HttpPost("send_email")]
+        public async Task<ActionResult> SendEmail(string email)
+        {
+            var result = await _emailService.SendEmailMessage(email);
+
+            
+            return Ok();
+
         }
 
     }

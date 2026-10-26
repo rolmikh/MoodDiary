@@ -2,6 +2,7 @@ using Diary.DTO;
 using Diary.Models;
 using Diary.Services.Implementations;
 using Diary.Services.Interfaces;
+using Diary.Settings;
 using Diary.Validators;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
@@ -17,10 +18,12 @@ builder.Services.AddDbContext<MoodDiaryDBContext>(options => options.UseNpgsql(c
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IEmojiService, EmojiService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddScoped<IValidator<AuthorizationDTO>, UserAuthorizationValidator>();
 builder.Services.AddScoped<IValidator<UserRegistrationDTO>, UserRegistrationValidator>();
 
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection(nameof(MailSettings)));
 
 builder.Services.AddScoped<PasswordHasher<User>>();
 builder.Services.AddEndpointsApiExplorer();

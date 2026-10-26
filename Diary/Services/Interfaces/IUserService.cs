@@ -9,5 +9,7 @@ namespace Diary.Services.Interfaces
         Task<ServiceResult> Registration(UserRegistrationDTO user);
 
         Task<ServiceResult> Authorization(AuthorizationDTO user);
+
+        //Task<string> GenerateCode();
     }
 }

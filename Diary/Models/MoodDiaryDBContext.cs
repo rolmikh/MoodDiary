@@ -9,6 +9,7 @@ namespace Diary.Models
         public virtual DbSet<Post> Post { get; set; }
         public virtual DbSet<Emoji> Emoji { get; set; }
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<UserVerificationToken> UserVerificationTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -32,6 +33,11 @@ namespace Diary.Models
                 entity.HasOne(e => e.Emoji)
                 .WithMany(t => t.Posts)
                 .HasForeignKey(e => e.EmojiId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.User)
+                .WithMany(t => t.Posts)
+                .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
             }
             );
@@ -75,7 +81,36 @@ namespace Diary.Models
                 entity.Property(e => e.Password)
                 .IsRequired(true);
 
-                
+                entity.Property(e => e.EmailConfirmed)
+                .IsRequired(true);
+
+            });
+
+            modelBuilder.Entity<UserVerificationToken>(entity =>
+            {
+                entity.ToTable(nameof(UserVerificationToken));
+
+                entity.HasKey(e => e.IdUserVerificationToken);
+
+                entity.Property(e => e.UserId);
+
+                entity.Property(e => e.ExpirationDate)
+                .IsRequired(true);
+
+                entity.Property(e => e.UsedAt)
+                .IsRequired(false);
+
+                entity.Property(e => e.HashData)
+                .IsRequired(true);
+
+                entity.Property(e => e.OperationType);
+
+                entity.HasOne(e => e.User)
+               .WithMany(t => t.UserVerificationTokens)
+               .HasForeignKey(e => e.UserId)
+               .OnDelete(DeleteBehavior.Cascade);
+
+
 
             });
         }

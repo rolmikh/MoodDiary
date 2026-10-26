@@ -16,8 +16,13 @@ namespace Diary.Models
 
         public string Password { get; private set; }
 
+        public bool EmailConfirmed { get; private set; } = false;
+
         [JsonIgnore]
         public ICollection<Post>? Posts { get;private set; }
+
+        [JsonIgnore]
+        public ICollection<UserVerificationToken>? UserVerificationTokens { get; private set; }
 
         public User(string email)
         {
@@ -29,6 +34,11 @@ namespace Diary.Models
         public void SetPasswordHash(string passwordHash)
         {
             Password = passwordHash;
+        }
+
+        public void SetEmailConfirmed()
+        {
+            EmailConfirmed = true;
         }
 
     }

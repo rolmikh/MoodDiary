@@ -114,5 +114,10 @@ namespace Diary.Services.Implementations
             
 
         }
+
+        //public async Task<string> GenerateCode()
+        //{
+
+        //}
     }
 }
