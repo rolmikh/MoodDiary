@@ -2,6 +2,6 @@
 {
     public interface IEmailService
     {
-        Task<bool> SendEmailMessage(string email);
+        Task<bool> SendEmailMessage(string to, string body, string subject);
     }
 }

@@ -39,6 +39,7 @@ namespace Diary.Models
         public void SetEmailConfirmed()
         {
             EmailConfirmed = true;
+
         }
 
     }

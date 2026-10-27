@@ -41,14 +41,32 @@ namespace Diary.Controllers
             return Ok();
         }
 
-        [HttpPost("send_email")]
-        public async Task<ActionResult> SendEmail(string email)
+        //[HttpPost("send_email")]
+        //public async Task<ActionResult> SendEmail(string email)
+        //{
+        //    var result = await _emailService.SendEmailMessage(email);
+
+
+        //    return Ok();
+
+        //}
+
+        //[HttpPost("Generate_code")]
+        //public async Task<ActionResult> GetCode()
+        //{
+        //    var result =  _userService.GenerateCode();
+
+
+        //    return Ok(result);
+
+        //}
+
+        [HttpPost("ConfirmEmail")]
+        public async Task<ActionResult> ConfirmEmail(string code, string email)
         {
-            var result = await _emailService.SendEmailMessage(email);
+            var result = await _userService.ConfirmEmail(code, email);
 
-            
-            return Ok();
-
+            return Ok(result);
         }
 
     }

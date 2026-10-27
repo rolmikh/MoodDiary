@@ -17,21 +17,20 @@ namespace Diary.Services.Implementations
             _settings = settings.Value;
         }
 
-        public async Task<bool> SendEmailMessage(string email)
+        public async Task<bool> SendEmailMessage(string to, string body, string subject)
         {
 
             try
             {
-                string body = "code will be here";
                 var message = new MimeMessage();
                 message.From.Add(new MailboxAddress(_settings.Sender, _settings.UserName));
-                message.To.Add(new MailboxAddress("", email));
+                message.To.Add(new MailboxAddress("", to));
 
-                message.Subject = "Код подтверждения";
+                message.Subject = subject;
 
                 message.Body = new TextPart("plain")
                 {
-                    Text = "3456"
+                    Text = body
                 };
                 using (var client = new SmtpClient())
                 {

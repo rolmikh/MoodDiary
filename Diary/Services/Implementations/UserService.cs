@@ -1,11 +1,10 @@
 ﻿using Diary.DTO;
 using Diary.Models;
 using Diary.Services.Interfaces;
-using Diary.Validators;
 using FluentValidation;
-using FluentValidation.Results;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 
 namespace Diary.Services.Implementations
 {
@@ -17,12 +16,16 @@ namespace Diary.Services.Implementations
 
         private readonly PasswordHasher<User> _passwordHasher;
 
-        public UserService(MoodDiaryDBContext context, IValidator<UserRegistrationDTO> registration_validator, IValidator<AuthorizationDTO> authorization_validator, PasswordHasher<User> passwordHasher) 
+        private readonly IEmailService _emailService;
+
+        
+        public UserService(MoodDiaryDBContext context, IValidator<UserRegistrationDTO> registration_validator, IValidator<AuthorizationDTO> authorization_validator, PasswordHasher<User> passwordHasher, IEmailService emailService) 
         {
             _dbContext = context;
             _registration_validator = registration_validator;
             _authorization_validator = authorization_validator;
             _passwordHasher = passwordHasher;
+            _emailService = emailService;
         
         }
         public async Task<ServiceResult> Registration(UserRegistrationDTO user)
@@ -59,6 +62,8 @@ namespace Diary.Services.Implementations
             _dbContext.Users.Add(newUser);
             await _dbContext.SaveChangesAsync();
 
+            await SendConfirmationCode(newUser.Email);
+
             return new ServiceResult
             {
                 IsSuccess = true
@@ -67,6 +72,9 @@ namespace Diary.Services.Implementations
 
         public async Task<ServiceResult> Authorization(AuthorizationDTO user)
         {
+           
+            
+
             var result = _authorization_validator.Validate(user);
 
             if (!result.IsValid)
@@ -80,7 +88,8 @@ namespace Diary.Services.Implementations
             }
 
             var foundUser =  await _dbContext.Users.FirstOrDefaultAsync(n => n.Email == user.Email);
-
+            
+           
             if (foundUser == null) 
             {
 
@@ -91,6 +100,16 @@ namespace Diary.Services.Implementations
 
                 };
  
+            }
+
+            if (foundUser.EmailConfirmed == false)
+            {
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    Error = "Электронная почта не подтверждена"
+
+                };
             }
 
             var result_password = _passwordHasher.VerifyHashedPassword(foundUser, foundUser.Password, user.Password);
@@ -110,14 +129,117 @@ namespace Diary.Services.Implementations
             {
                 IsSuccess = true
             };
-            
-            
+        }
+
+        public async Task<bool> SendConfirmationCode(string email)
+        {
+
+            string code = GenerateCode();
+
+            string body = code;
+
+            string subject = "Код подтверждения";
+
+            try
+            {
+                if (await SaveCodeToDatabase(code, email) == false)
+                {
+                    return false;
+                };
+
+                if (await _emailService.SendEmailMessage(email, body, subject) == false)
+                {
+                    return false;
+                }
+
+                return true;
+
+            }
+            catch (Exception)
+            {
+                return false;
+            }
 
         }
 
-        //public async Task<string> GenerateCode()
-        //{
+        public async Task<bool> SaveCodeToDatabase(string code, string email)
+        {
+            try
+            {
+                var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == email);
 
-        //}
+                if (user == null)
+                {
+                    return false;
+                }
+
+                UserVerificationToken userVerificationToken = new UserVerificationToken(user.IdUser, code, TypeOperationEnum.EmailConfirmation);
+
+                _dbContext.UserVerificationTokens.Add(userVerificationToken);
+                await _dbContext.SaveChangesAsync();
+
+                return true;
+            }
+            catch(Exception)
+            {
+                return false; 
+            }
+
+        }
+
+        public async Task<bool> ConfirmEmail(string code, string email)
+        {
+            try
+            {
+                var foundUser = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == email);
+
+                if (foundUser == null)
+                {
+                    return false;
+                }
+
+                var userToken = await _dbContext.UserVerificationTokens.FirstOrDefaultAsync(s => s.UserId == foundUser.IdUser);
+
+                if (userToken == null)
+                {
+                    return false;
+                }
+
+                if (code == userToken.HashData)
+                {
+                    User user = await _dbContext.Users.FindAsync(foundUser.IdUser);
+
+                    if (user == null)
+                    {
+                        return false;
+                    }
+
+                    user.SetEmailConfirmed();
+
+                    _dbContext.Users.Update(user);
+
+                    await _dbContext.SaveChangesAsync();
+
+                    return true;
+                }
+                
+                return false;
+                
+
+                
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+           
+        }
+
+        public string GenerateCode()
+        {
+
+            return RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
+
+        }
     }
 }
