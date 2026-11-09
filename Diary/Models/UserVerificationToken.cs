@@ -27,7 +27,11 @@ namespace Diary.Models
             ExpirationDate = DateTime.UtcNow + TimeSpan.FromHours(2);
             this.HashData = HashData;
             this.OperationType = OperationType;
+        }
 
+        public void SetUsedAt()
+        {
+            UsedAt = DateTime.UtcNow;
         }
 
     }

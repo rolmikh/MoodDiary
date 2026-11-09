@@ -131,7 +131,7 @@ namespace Diary.Services.Implementations
             };
         }
 
-        public async Task<bool> SendConfirmationCode(string email)
+        public async Task<ServiceResult> SendConfirmationCode(string email)
         {
 
             string code = GenerateCode();
@@ -144,20 +144,38 @@ namespace Diary.Services.Implementations
             {
                 if (await SaveCodeToDatabase(code, email) == false)
                 {
-                    return false;
-                };
+                    return new ServiceResult
+                    {
+                        IsSuccess = false,
+                        Error = "Пользователя не существует"
+
+                    };
+                }
 
                 if (await _emailService.SendEmailMessage(email, body, subject) == false)
                 {
-                    return false;
+                    return new ServiceResult
+                    {
+                        IsSuccess = false,
+                        Error = "Не получилось отправить письмо"
+
+                    };
                 }
 
-                return true;
+                return new ServiceResult
+                {
+                    IsSuccess = true
+                };
 
             }
             catch (Exception)
             {
-                return false;
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    Error = "Ошибка"
+
+                };
             }
 
         }
@@ -187,7 +205,7 @@ namespace Diary.Services.Implementations
 
         }
 
-        public async Task<bool> ConfirmEmail(string code, string email)
+        public async Task<ServiceResult> ConfirmEmail(string code, string email)
         {
             try
             {
@@ -195,42 +213,81 @@ namespace Diary.Services.Implementations
 
                 if (foundUser == null)
                 {
-                    return false;
+                    return new ServiceResult
+                    {
+                        IsSuccess = false,
+                        Error = "Пользователь не найден"
+
+                    };
                 }
 
-                var userToken = await _dbContext.UserVerificationTokens.FirstOrDefaultAsync(s => s.UserId == foundUser.IdUser);
+                var userToken = await _dbContext.UserVerificationTokens.FirstOrDefaultAsync(s => s.UserId == foundUser.IdUser && s.OperationType == TypeOperationEnum.EmailConfirmation);
 
                 if (userToken == null)
                 {
-                    return false;
+                    return new ServiceResult
+                    {
+                        IsSuccess = false,
+                        Error = "Ошибка"
+
+                    };
                 }
+
+                if (userToken.UsedAt != null)
+                {
+                    return new ServiceResult
+                    {
+                        IsSuccess = false,
+                        Error = "По данному коду уже подтверждали электронную почту"
+
+                    };
+                }
+
+                if (DateTime.UtcNow > userToken.ExpirationDate)
+                {
+                    return new ServiceResult
+                    {
+                        IsSuccess = false,
+                        Error = "Срок действия кода истек"
+
+                    };
+                }
+
+                
 
                 if (code == userToken.HashData)
                 {
-                    User user = await _dbContext.Users.FindAsync(foundUser.IdUser);
 
-                    if (user == null)
-                    {
-                        return false;
-                    }
+                    foundUser.SetEmailConfirmed();
 
-                    user.SetEmailConfirmed();
-
-                    _dbContext.Users.Update(user);
+                    userToken.SetUsedAt();
 
                     await _dbContext.SaveChangesAsync();
 
-                    return true;
+                    return new ServiceResult
+                    {
+                        IsSuccess = true
+                    };
                 }
-                
-                return false;
-                
 
-                
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    Error = "Электронная почта не подтверждена"
+
+                };
+
+
+
             }
             catch (Exception)
             {
-                return false;
+                return new ServiceResult
+                {
+                    IsSuccess = false,
+                    Error = "Ошибка"
+
+                };
             }
            
         }

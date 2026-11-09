@@ -12,10 +12,10 @@ namespace Diary.Services.Interfaces
 
         string GenerateCode();
 
-        Task<bool> SendConfirmationCode(string email);
+        Task<ServiceResult> SendConfirmationCode(string email);
 
         Task<bool> SaveCodeToDatabase(string code, string email);
 
-        Task<bool> ConfirmEmail(string code, string email);
+        Task<ServiceResult> ConfirmEmail(string code, string email);
     }
 }
